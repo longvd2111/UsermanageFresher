@@ -1,15 +1,27 @@
+// ModalAddNew.js
 import React, { useState } from "react";
 import { Modal, Button, Row, Col, Form } from "react-bootstrap";
+import { postCreateUser } from "../services/userService";
+import { toast } from "react-toastify";
 
 const ModalAddNew = (props) => {
-  const { show, handleClose } = props;
+  const { show, handleClose, handleUpdateTable } = props;
 
   const [name, setName] = useState("");
   const [job, setJob] = useState("");
 
-  const handleSave = () => {
-    console.log(name);
-    console.log(job);
+  const handleSave = async () => {
+    let res = await postCreateUser(name, job);
+
+    if (res && res.id) {
+      handleClose();
+      setName("");
+      setJob("");
+      toast.success("A new user is created success");
+      handleUpdateTable({ first_name: name, id: res.id });
+    } else {
+      toast.error("Failed to create user");
+    }
   };
 
   return (
@@ -21,8 +33,8 @@ const ModalAddNew = (props) => {
         <Modal.Body>
           <div className="body-add-new">
             <Form>
-              <Form.Group as={Row} className="mb-3" controlId="name">
-                <Form.Label column sm="2" for="name">
+              <Form.Group as={Row} className="mb-3">
+                <Form.Label column sm="2" htmlFor="name">
                   Name:
                 </Form.Label>
                 <Col sm="10">
@@ -35,8 +47,8 @@ const ModalAddNew = (props) => {
                 </Col>
               </Form.Group>
 
-              <Form.Group as={Row} className="mb-3" controlId="job">
-                <Form.Label column sm="2" for="job">
+              <Form.Group as={Row} className="mb-3">
+                <Form.Label column sm="2" htmlFor="job">
                   Job:
                 </Form.Label>
                 <Col sm="10">
