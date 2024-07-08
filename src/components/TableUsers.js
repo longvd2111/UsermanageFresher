@@ -4,6 +4,7 @@ import { fetchAllUser } from "../services/userService";
 import ReactPaginate from "react-paginate";
 import ModalAddNew from "./ModalAddNew";
 import ModalEditNew from "./ModalEditNew";
+import _ from "lodash";
 
 const TableUsers = (props) => {
   const [listUsers, setListUsers] = useState([]);
@@ -20,6 +21,14 @@ const TableUsers = (props) => {
 
   const handleUpdateTable = (user) => {
     setListUsers([user, ...listUsers]);
+  };
+
+  const handleEditUserFromModal = (user) => {
+    let index = listUsers.findIndex((item) => (item.id = user.id));
+    let clonelistUsers = _.cloneDeep(listUsers);
+    clonelistUsers[index].first_name = user.first_name;
+
+    setListUsers(clonelistUsers);
   };
 
   useEffect(() => {
@@ -82,7 +91,7 @@ const TableUsers = (props) => {
                       className="mx-3"
                       onClick={() => handleEditUser(item)}
                     >
-                      Confirm
+                      Edit
                     </Button>
                     <Button variant="danger">Delete</Button>
                   </td>
@@ -120,7 +129,7 @@ const TableUsers = (props) => {
       <ModalEditNew
         show={isShowModalEdit}
         handleClose={handleClose}
-        handleUpdateTable={handleUpdateTable}
+        handleEditUserFromModal={handleEditUserFromModal}
         dataUserEdit={dataUserEdit}
       />
     </>

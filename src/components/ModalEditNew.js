@@ -1,26 +1,27 @@
 // ModalAddNew.js
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Row, Col, Form } from "react-bootstrap";
-import { postCreateUser } from "../services/userService";
+import { putUpdateUser } from "../services/userService";
 import { toast } from "react-toastify";
 
 const ModalEditNew = (props) => {
-  const { show, handleClose, handleUpdateTable, dataUserEdit } = props;
+  const { show, handleClose, handleEditUserFromModal, dataUserEdit } = props;
 
   const [name, setName] = useState("");
   const [job, setJob] = useState("");
 
   const handleEditUser = async () => {
-    let res = await postCreateUser(name, job);
+    let res = await putUpdateUser(dataUserEdit && dataUserEdit.id, name, job);
 
-    if (res && res.id) {
+    if (res && res.updatedAt) {
+      handleEditUserFromModal({
+        first_name: name,
+        id: dataUserEdit && dataUserEdit.id,
+      });
       handleClose();
-      setName("");
-      setJob("");
-      toast.success("A new user is created success");
-      handleUpdateTable({ first_name: name, id: res.id });
+      toast.success("Updated success!");
     } else {
-      toast.error("Failed to create user");
+      toast.error("Failed to update user");
     }
   };
 
@@ -74,7 +75,7 @@ const ModalEditNew = (props) => {
             Close
           </Button>
           <Button variant="primary" onClick={handleEditUser}>
-            Save Changes
+            Confirm
           </Button>
         </Modal.Footer>
       </Modal>
