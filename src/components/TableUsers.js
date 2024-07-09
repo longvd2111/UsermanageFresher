@@ -4,7 +4,7 @@ import { fetchAllUser } from "../services/userService";
 import ReactPaginate from "react-paginate";
 import ModalAddNew from "./ModalAddNew";
 import ModalEditNew from "./ModalEditNew";
-import _ from "lodash";
+import _, { debounce } from "lodash";
 import ModalConfirm from "./ModalConfirm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
@@ -84,7 +84,7 @@ const TableUsers = (props) => {
     setListUsers(clonelistUsers);
   };
 
-  const handleSearch = (event) => {
+  const handleSearch = debounce((event) => {
     let term = event.target.value;
     setKeyWord(term);
 
@@ -97,7 +97,7 @@ const TableUsers = (props) => {
     } else {
       getUsers(1);
     }
-  };
+  }, 1000);
 
   return (
     <>
