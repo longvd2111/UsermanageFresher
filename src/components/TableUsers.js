@@ -6,6 +6,9 @@ import ModalAddNew from "./ModalAddNew";
 import ModalEditNew from "./ModalEditNew";
 import _ from "lodash";
 import ModalConfirm from "./ModalConfirm";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
+import "./Table.scss";
 
 const TableUsers = (props) => {
   const [listUsers, setListUsers] = useState([]);
@@ -17,6 +20,9 @@ const TableUsers = (props) => {
 
   const [dataUserEdit, setDataUserEdit] = useState({});
   const [dataUserDelete, setDataUserDelete] = useState({});
+
+  const [sortBy, setSortBy] = useState("");
+  const [sortField, setSortField] = useState("id");
 
   const handleClose = () => {
     setIsShowModalAddNew(false);
@@ -32,13 +38,12 @@ const TableUsers = (props) => {
     let index = listUsers.findIndex((item) => (item.id = user.id));
     let clonelistUsers = _.cloneDeep(listUsers);
     clonelistUsers[index].first_name = user.first_name;
-
     setListUsers(clonelistUsers);
   };
 
   const handleDeleteUserFromModal = (user) => {
     let clonelistUsers = _.cloneDeep(listUsers);
-    clonelistUsers = clonelistUsers.filter((item) => item.id != user.id);
+    clonelistUsers = clonelistUsers.filter((item) => item.id !== user.id);
     setListUsers(clonelistUsers);
   };
 
@@ -68,6 +73,16 @@ const TableUsers = (props) => {
     setIsShowModalDelete(true);
   };
 
+  const handleSort = (sortBy, sortField) => {
+    setSortBy(sortBy);
+    setSortField(sortField);
+
+    let clonelistUsers = _.cloneDeep(listUsers);
+    clonelistUsers.sort((a, b) => a[sortField] - b[sortField]);
+    clonelistUsers = _.orderBy(clonelistUsers, [sortField], [sortBy]);
+    setListUsers(clonelistUsers);
+  };
+
   return (
     <>
       <div className="my-3 add-new">
@@ -84,9 +99,33 @@ const TableUsers = (props) => {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>
+              <div className="sort-header">
+                <span>ID</span>
+                <span>
+                  <i onClick={() => handleSort("asc", "id")}>
+                    <FontAwesomeIcon icon={faArrowUp} />
+                  </i>
+                  <i onClick={() => handleSort("desc", "id")}>
+                    <FontAwesomeIcon icon={faArrowDown} />
+                  </i>
+                </span>
+              </div>
+            </th>
             <th>Email</th>
-            <th>First Name</th>
+            <th>
+              <div className="sort-header">
+                <span>First Name</span>
+                <span>
+                  <i onClick={() => handleSort("asc", "first_name")}>
+                    <FontAwesomeIcon icon={faArrowUp} />
+                  </i>
+                  <i onClick={() => handleSort("desc", "first_name")}>
+                    <FontAwesomeIcon icon={faArrowDown} />
+                  </i>
+                </span>
+              </div>
+            </th>
             <th>Last Name</th>
             <th>Actions</th>
           </tr>
@@ -157,8 +196,8 @@ const TableUsers = (props) => {
       <ModalConfirm
         show={isShowModalDelete}
         handleClose={handleClose}
-        dataUserDelete={dataUserDelete}
         handleDeleteUserFromModal={handleDeleteUserFromModal}
+        dataUserDelete={dataUserDelete}
       />
     </>
   );

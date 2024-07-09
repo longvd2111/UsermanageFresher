@@ -5,15 +5,15 @@ import { deleteUser } from "../services/userService";
 import { toast } from "react-toastify";
 
 const ModalConfirm = (props) => {
-  const { show, handleClose, dataUserDelete, handleDeleteFromModal } = props;
+  const { show, handleClose, dataUserDelete, handleDeleteUserFromModal } =
+    props;
 
   const handleConfirm = async () => {
     const res = await deleteUser(dataUserDelete && dataUserDelete.id);
-    console.log(+res.statusCode);
     if (res && +res.statusCode === 204) {
-      handleDeleteFromModal(dataUserDelete);
       handleClose();
       toast.success("Delete success!");
+      handleDeleteUserFromModal(dataUserDelete);
     } else {
       toast.error("Failed to delete user!");
     }
