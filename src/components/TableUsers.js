@@ -24,6 +24,8 @@ const TableUsers = (props) => {
   const [sortBy, setSortBy] = useState("");
   const [sortField, setSortField] = useState("id");
 
+  const [keyWord, setKeyWord] = useState("");
+
   const handleClose = () => {
     setIsShowModalAddNew(false);
     setIsShowModalEdit(false);
@@ -78,9 +80,23 @@ const TableUsers = (props) => {
     setSortField(sortField);
 
     let clonelistUsers = _.cloneDeep(listUsers);
-    clonelistUsers.sort((a, b) => a[sortField] - b[sortField]);
     clonelistUsers = _.orderBy(clonelistUsers, [sortField], [sortBy]);
     setListUsers(clonelistUsers);
+  };
+
+  const handleSearch = (event) => {
+    let term = event.target.value;
+    setKeyWord(term);
+
+    if (term) {
+      let clonelistUsers = _.cloneDeep(listUsers);
+      clonelistUsers = clonelistUsers.filter((item) =>
+        item.email.includes(term)
+      );
+      setListUsers(clonelistUsers);
+    } else {
+      getUsers(1);
+    }
   };
 
   return (
@@ -96,6 +112,16 @@ const TableUsers = (props) => {
           Add new user
         </button>
       </div>
+
+      <div className="col-4 my-3">
+        <input
+          className="form-control"
+          placeholder="Search by email...."
+          value={keyWord}
+          onChange={(e) => handleSearch(e)}
+        />
+      </div>
+
       <Table striped bordered hover>
         <thead>
           <tr>
