@@ -1,5 +1,5 @@
 // App.js
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Container } from "react-bootstrap";
 import Header from "./components/Header";
 import TableUsers from "./components/TableUsers";
@@ -9,8 +9,10 @@ import "./App.scss";
 import Home from "./components/Home";
 import { Link, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
+import { UserContext } from "./context/UserContext";
 
 function App() {
+  const { user } = useContext(UserContext);
   return (
     <>
       <div className="app-container">

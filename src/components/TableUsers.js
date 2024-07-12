@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import { fetchAllUser } from "../services/userService";
 import ReactPaginate from "react-paginate";
@@ -7,8 +7,15 @@ import ModalEditNew from "./ModalEditNew";
 import _, { debounce } from "lodash";
 import ModalConfirm from "./ModalConfirm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowUp,
+  faArrowDown,
+  faCirclePlus,
+  faFileArrowDown,
+  faFileImport,
+} from "@fortawesome/free-solid-svg-icons";
 import "./Table.scss";
+import { CSVLink, CSVDownload } from "react-csv";
 
 const TableUsers = (props) => {
   const [listUsers, setListUsers] = useState([]);
@@ -84,20 +91,32 @@ const TableUsers = (props) => {
     setListUsers(clonelistUsers);
   };
 
-  const handleSearch = debounce((event) => {
+  const handleSearch = (event) => {
     let term = event.target.value;
-    setKeyWord(term);
+    debouncedSearch(term);
+  };
 
-    if (term) {
-      let clonelistUsers = _.cloneDeep(listUsers);
-      clonelistUsers = clonelistUsers.filter((item) =>
-        item.email.includes(term)
-      );
-      setListUsers(clonelistUsers);
-    } else {
-      getUsers(1);
-    }
-  }, 1000);
+  const debouncedSearch = useCallback(
+    _.debounce((term) => {
+      if (term) {
+        let clonedListUsers = _.cloneDeep(listUsers);
+        clonedListUsers = clonedListUsers.filter((item) =>
+          item.email.includes(term)
+        );
+        setListUsers(clonedListUsers);
+      } else {
+        getUsers(1);
+      }
+    }, 300),
+    [listUsers]
+  );
+
+  const csvData = [
+    ["firstname", "lastname", "email"],
+    ["Ahmed", "Tomi", "ah@smthing.co.com"],
+    ["Raed", "Labes", "rl@smthing.co.com"],
+    ["Yezzi", "Min l3b", "ymin@cocococo.com"],
+  ];
 
   return (
     <>
@@ -105,19 +124,35 @@ const TableUsers = (props) => {
         <span>
           <h3>List Users:</h3>
         </span>
-        <button
-          className="btn btn-success"
-          onClick={() => setIsShowModalAddNew(true)}
-        >
-          Add new user
-        </button>
+        <div className="group-btns">
+          <label htmlFor="import" className="btn btn-warning">
+            <FontAwesomeIcon icon={faFileImport} />
+            &nbsp;Import
+          </label>
+          <input type="file" id="import" hidden></input>
+          <CSVLink
+            data={csvData}
+            filename={"user.csv"}
+            className="btn btn-primary"
+          >
+            <FontAwesomeIcon icon={faFileArrowDown} />
+            &nbsp;Export
+          </CSVLink>
+          <button
+            className="btn btn-success"
+            onClick={() => setIsShowModalAddNew(true)}
+          >
+            <FontAwesomeIcon icon={faCirclePlus} />
+            &nbsp;Add new
+          </button>
+        </div>
       </div>
 
       <div className="col-4 my-3">
         <input
           className="form-control"
           placeholder="Search by email...."
-          value={keyWord}
+          // value={keyWord}
           onChange={(e) => handleSearch(e)}
         />
       </div>

@@ -1,37 +1,65 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   faChevronLeft,
   faEye,
   faEyeSlash,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import { loginApi } from "../services/userService";
 import { toast, Toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { loginContext } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isShowPassword, setIsShowPassword] = useState(false);
 
+  const [loadingApi, setLoadingApi] = useState(false);
+
+  useEffect(() => {
+    let token = localStorage.getItem("token");
+    if (token) {
+      navigate("/");
+    }
+  }, []);
+
   const handleLogin = async () => {
-    alert("ME");
     if (!email || !password) {
       toast.error("Email/Password is required");
       return;
     }
 
+    setLoadingApi(true);
     let res = await loginApi(email, password);
-
     if (res && res.token) {
-      localStorage.setItem("token", res.token);
+      loginContext(email, res.token);
+      navigate("/");
+    } else {
+      //error
+      if (res && res.status === 400) {
+        toast.error(res.data.error);
+      }
     }
+    return () => {
+      setLoadingApi(false);
+    };
+  };
+
+  const handleGoBack = () => {
+    navigate("/");
   };
 
   return (
     <>
       <div className="login-container col-sm-4 col-12">
         <div className="title">Log in</div>
-        <div className="text">Email or username</div>
+        <div className="text">
+          Email or username (eve.holt@reqres.in)(cityslicka)
+        </div>
         <input
           type="text"
           placeholder="Text email..."
@@ -53,13 +81,17 @@ const Login = () => {
         </div>
         <button
           className={email && password ? "active" : ""}
-          disabled={email && password ? false : true}
+          disabled={!email || !password || loadingApi}
           onClick={() => handleLogin()}
         >
-          Login
+          {loadingApi && (
+            <FontAwesomeIcon icon={faSpinner} className="spinner fa-spin" />
+          )}
+          &nbsp;Login
         </button>
         <div className="back">
-          <FontAwesomeIcon icon={faChevronLeft} /> Go back
+          <FontAwesomeIcon icon={faChevronLeft} />
+          <span onClick={() => handleGoBack()}>&nbsp;Go back</span>
         </div>
       </div>
     </>
