@@ -6,19 +6,22 @@ import {
   faEyeSlash,
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
-import { loginApi } from "../services/userService";
-import { toast, Toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { handleLoginRedux } from "../redux/actions/userActions";
+import { useDispatch, useSelector } from "react-redux";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { loginContext } = useContext(UserContext);
+
+  const dispatch = useDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isShowPassword, setIsShowPassword] = useState(false);
 
-  const [loadingApi, setLoadingApi] = useState(false);
+  const isLoading = useSelector((state) => state.user.isLoading);
+  const account = useSelector((state) => state.user.account);
 
   useEffect(() => {
     let token = localStorage.getItem("token");
@@ -33,25 +36,18 @@ const Login = () => {
       return;
     }
 
-    setLoadingApi(true);
-    let res = await loginApi(email, password);
-    if (res && res.token) {
-      loginContext(email, res.token);
-      navigate("/");
-    } else {
-      //error
-      if (res && res.status === 400) {
-        toast.error(res.data.error);
-      }
-    }
-    return () => {
-      setLoadingApi(false);
-    };
+    dispatch(handleLoginRedux(email, password));
   };
 
   const handleGoBack = () => {
     navigate("/");
   };
+
+  useEffect(() => {
+    if (account && account.auth === true) {
+      navigate("/");
+    }
+  }, [account]);
 
   return (
     <>
@@ -81,10 +77,10 @@ const Login = () => {
         </div>
         <button
           className={email && password ? "active" : ""}
-          disabled={!email || !password || loadingApi}
+          disabled={!email || !password || isLoading}
           onClick={() => handleLogin()}
         >
-          {loadingApi && (
+          {isLoading && (
             <FontAwesomeIcon icon={faSpinner} className="spinner fa-spin" />
           )}
           &nbsp;Login

@@ -1,5 +1,5 @@
 // App.js
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import Header from "./components/Header";
 import { ToastContainer, toast, Bounce } from "react-toastify";
@@ -8,9 +8,16 @@ import "./App.scss";
 
 import { UserContext } from "./context/UserContext";
 import AppRoutes from "./routes/AppRoutes";
+import { useDispatch, useSelector } from "react-redux";
+import { handleRefresh } from "./redux/actions/userActions";
 
 function App() {
-  const { user } = useContext(UserContext);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      dispatch(handleRefresh());
+    }
+  }, []);
   return (
     <>
       <div className="app-container">

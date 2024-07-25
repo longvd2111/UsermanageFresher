@@ -1,9 +1,8 @@
-import React, { useContext } from "react";
-import { Route, Routes } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
+import React from "react";
+import { useSelector } from "react-redux";
 
 const PrivateRoutes = (props) => {
-  const { user, loginContext } = useContext(UserContext);
+  const user = useSelector((state) => state.user.account);
   if (user && !user.auth) {
     return <>You don't have permission to access this page</>;
   }
