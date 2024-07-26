@@ -54,7 +54,7 @@ const Login = () => {
       <div className="login-container col-sm-4 col-12">
         <div className="title">Log in</div>
         <div className="text">
-          Email or username (eve.holt@reqres.in)(cityslicka)
+          Email or username (email:eve.holt@reqres.in)(pw:cityslicka)
         </div>
         <input
           type="text"
