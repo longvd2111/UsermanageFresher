@@ -17,12 +17,12 @@ const Header = (props) => {
 
   const handleLogout = () => {
     dispatch(handleLogoutRedux());
+    toast.success("Log out success!");
   };
 
   useEffect(() => {
     if (user && user.auth === false) {
-      navigate("/");
-      toast.success("Log out success!");
+      navigate("/login");
     }
   }, [user]);
 
